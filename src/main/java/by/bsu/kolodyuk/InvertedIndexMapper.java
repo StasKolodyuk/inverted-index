@@ -1,24 +1,35 @@
 package by.bsu.kolodyuk;
 
 
-public static class InvertedIndexMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.*;
 
-  private final static Text word = new Text();
-  private final static Text location = new Text();
+import java.io.IOException;
+import java.util.StringTokenizer;
 
-  public void map(LongWritable key, Text val,
-  OutputCollector<Text, Text> output, Reporter reporter)
-  throws IOException {
+public class InvertedIndexMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
-    FileSplit fileSplit = (FileSplit)reporter.getInputSplit();
-    String fileName = fileSplit.getPath().getName();
-    location.set(fileName);
+    private final static Text word = new Text();
+    private final static Text location = new Text();
 
-    String line = val.toString();
-    StringTokenizer itr = new StringTokenizer(line.toLowerCase());
-    while (itr.hasMoreTokens()) {
-      word.set(itr.nextToken());
-      output.collect(word, location);
+    public void map(LongWritable key, Text val, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+        FileSplit fileSplit = (FileSplit) reporter.getInputSplit();
+        String fileName = fileSplit.getPath().getName();
+        location.set(fileName);
+
+
+        System.out.println("**** Mapper ****");
+        System.out.println("Key: " + key);
+        System.out.println("File: " + fileName);
+        System.out.println("Line: " + val);
+        System.out.println("****************");
+
+        String line = val.toString();
+        StringTokenizer itr = new StringTokenizer(line.toLowerCase());
+        while (itr.hasMoreTokens()) {
+            word.set(itr.nextToken());
+            output.collect(word, location);
+        }
     }
-  }
 }
